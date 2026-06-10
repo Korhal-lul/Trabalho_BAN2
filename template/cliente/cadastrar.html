@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h2>Novo Cliente</h2>
+
+<form method="POST">
+
+<div class="mb-3">
+
+<label>Telefone</label>
+
+<input
+type="text"
+name="telefone"
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label>Tipo</label>
+
+<select
+name="tipo_cliente"
+class="form-select">
+
+<option value="PF">PF</option>
+<option value="PJ">PJ</option>
+<option value="Contrato">Contrato</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label>ID Endereço</label>
+
+<input
+type="number"
+name="id_endereco"
+class="form-control">
+
+</div>
+
+<button class="btn btn-success">
+Salvar
+</button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,181 @@
+CREATE SCHEMA trabalho;
+
+CREATE TABLE Endereco (
+    id_endereco SERIAL PRIMARY KEY,
+    rua VARCHAR(100),
+    cidade VARCHAR(100),
+    estado VARCHAR(100),
+    numero INT
+);
+
+CREATE TABLE Tabela_precos (
+    id_tabela_precos SERIAL PRIMARY KEY, 
+    descricao VARCHAR(200), 
+    regras TEXT
+);
+
+CREATE TABLE Cliente (
+    id_cliente SERIAL PRIMARY KEY,
+    telefone VARCHAR(15),
+    email VARCHAR(50),
+    tipo_cliente VARCHAR(20) CHECK (tipo_cliente IN ('PF', 'PJ', 'Contrato')) NOT NULL,
+    id_endereco INTEGER REFERENCES Endereco(id_endereco)
+);
+
+CREATE TABLE PF (
+    id_cliente INT PRIMARY KEY REFERENCES Cliente(id_cliente),
+    cpf CHAR(11) UNIQUE NOT NULL,
+    nome VARCHAR(100)
+);
+
+CREATE TABLE PJ (
+    id_cliente INT PRIMARY KEY REFERENCES Cliente(id_cliente),
+    cnpj CHAR(14) UNIQUE NOT NULL,
+    razao_social VARCHAR(100),
+    inscricao_estadual VARCHAR(20)
+);
+
+
+CREATE TABLE Cliente_contratado (
+    id_cliente INT PRIMARY KEY REFERENCES Cliente(id_cliente),
+    limite_credito DECIMAL(10,2), 
+    id_tabela_precos INTEGER REFERENCES Tabela_precos(id_tabela_precos)
+);
+
+
+CREATE TABLE Pedido (
+    id_pedido SERIAL PRIMARY KEY,
+    id_cliente INTEGER REFERENCES Cliente(id_cliente),
+    descricao_carga VARCHAR(200),
+    data_solicitacao DATE DEFAULT CURRENT_DATE,
+    tipo_servico VARCHAR(100),
+    contato VARCHAR(15),
+    data_agendada DATE,
+    periodo VARCHAR(20) CHECK(periodo IN('MATUTINO', 'VESPERTINO', 'NOTURNO')),
+    volume_total INT,
+    valor_declarado DECIMAL(10,2),
+    contato_destino VARCHAR(15),
+    peso_total DECIMAL(10,2),
+    prazo_entrega DATE,
+    forma_pagamento VARCHAR(20) CHECK(forma_pagamento IN('Cartão', 'Boleto', 'Cheque')),
+    status VARCHAR(20) CHECK(status IN('Entregue', 'A caminho', 'Pago', 'Separação')),
+    valor_frete DECIMAL(10,2),
+    id_endereco_entrega INTEGER REFERENCES Endereco(id_endereco),
+    id_endereco_coleta INTEGER REFERENCES Endereco(id_endereco)
+);
+
+CREATE TABLE Conhecimento (
+    id_pedido INT PRIMARY KEY REFERENCES Pedido(id_pedido) ON DELETE CASCADE,
+    discriminacao_carga VARCHAR(100),
+    numero_ctrc INTEGER UNIQUE,
+    data_emissao DATE,
+    nota_fiscal VARCHAR(100),
+    remetente VARCHAR(100),
+    destinatario VARCHAR(100),
+    valor_frete DECIMAL(10,2),
+    impostos DECIMAL(10,2),
+    seguro VARCHAR(100)
+);
+
+CREATE TABLE Volume (
+    id_volume SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL REFERENCES Pedido(id_pedido) ON DELETE CASCADE,
+    tipo_embalagem VARCHAR(50),
+    peso DECIMAL(10,2),
+    dimensoes VARCHAR(50),
+    descricao VARCHAR(200)
+);
+
+CREATE TABLE Eventos (
+    id_evento SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL REFERENCES Pedido(id_pedido) ON DELETE CASCADE,
+    data DATE,
+    hora TIME,
+    localizacao VARCHAR(100),
+    descricao VARCHAR(200),
+    foto BYTEA
+);
+
+CREATE TABLE Tentativa_entrega (
+    id_tentativa SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL REFERENCES Pedido(id_pedido) ON DELETE CASCADE,
+    data DATE,
+    hora TIME,
+    motivo VARCHAR(200),
+    nota_tentativa VARCHAR(200)
+);
+
+CREATE TABLE Entrega (
+    id_pedido INT PRIMARY KEY REFERENCES Pedido(id_pedido) ON DELETE CASCADE,
+    id_tentativa_origem INT REFERENCES Tentativa_entrega(id_tentativa),
+    nome_recebedor VARCHAR(100),
+    doc_recebedor VARCHAR(100),
+    funcao VARCHAR(50),
+    data DATE,
+    assinatura BYTEA,
+    foto_comprovante BYTEA
+);
+
+CREATE TABLE Motorista(
+	id_motorista SERIAL PRIMARY KEY,
+	nome VARCHAR(100),
+	cpf VARCHAR(20) UNIQUE,
+	numero_cnh VARCHAR(30),
+	categoria_cnh VARCHAR(50),
+	data_validade_cnh DATE,
+	telefone VARCHAR(30),
+	data_admissao DATE,
+	tipo_veiculo VARCHAR(30),
+	situacao VARCHAR(30)
+);
+
+CREATE TABLE Veiculo(
+	id_veiculo SERIAL PRIMARY KEY,
+	capacidade_kg FLOAT,
+	capacidade_m3 FLOAT,
+	tipo VARCHAR(50),
+	quilometragem VARCHAR(50),
+	data_aquisicao DATE,
+	status varchar(50),
+	prox_manutencao DATE,
+	ano_fabricacao VARCHAR(10),
+	modelo VARCHAR(30),
+	marca VARCHAR(30),
+	placa VARCHAR(30),
+	id_motorista int references Motorista(id_motorista)
+);
+
+CREATE TABLE Manutencao(
+	id_manutencao SERIAL PRIMARY KEY,
+	data DATE,
+	tipo VARCHAR(30),
+	km VARCHAR(10),
+	descricao VARCHAR(200),
+	oficina VARCHAR(30),
+	pecas_trocadas VARCHAR(200),
+	valor_total DECIMAL(10,2),
+	proxima DATE,
+	id_veiculo int references Veiculo(id_veiculo)
+);
+
+CREATE TABLE Rota(
+	id_rota SERIAL PRIMARY KEY,
+	data DATE,
+	remetente VARCHAR(50),
+	status VARCHAR(50),
+	km_inicial INT,
+	km_final INT
+);
+
+CREATE TABLE Rota_Pedido(
+    id_rota INTEGER,
+    id_pedido INTEGER,
+    PRIMARY KEY (id_rota, id_pedido),
+    FOREIGN KEY (id_rota) REFERENCES rota(id_rota),
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido),
+	sequencia_entrega VARCHAR(50),
+	horario_previsto TIME,
+	horario_real TIME
+);
+
+
