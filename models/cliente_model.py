@@ -1,41 +1,73 @@
-from config.database import get_connection
+from config.database import db
 
-class ClienteModel:
+class Cliente(db.Model):
+    __tablename__ = 'cliente'
+    
+    id_cliente = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    telefone = db.Column(db.String(15))
+    email = db.Column(db.String(50))
+    tipo_cliente = db.Column(db.String(20), nullable=False)
+    id_endereco = db.Column(db.Integer, db.ForeignKey('endereco.id_endereco'))
+    
+    __mapper_args__ = {
+        'polymorphic_on': tipo_cliente,
+        'polymorphic_identity': 'cliente'
+    }
 
-    @staticmethod
-    def listar():
-        conn = get_connection()
-        cur = conn.cursor()
+class PF(Cliente):
+    __tablename__ = 'pf'
+    id_cliente = db.Column(db.Integer, db.ForeignKey('cliente.id_cliente'), primary_key=True)
+    cpf = db.Column(db.String(11), unique=True, nullable=False)
+    nome = db.Column(db.String(100))
+    
+    __mapper_args__ = {
+        'polymorphic_identity': 'PF'
+    }
 
-        cur.execute("""
-            SELECT id_cliente,
-                   telefone,
-                   email,
-                   tipo_cliente
-            FROM trabalho.cliente
-            ORDER BY id_cliente
-        """)
+class PJ(Cliente):
+    __tablename__ = 'pj'
+    id_cliente = db.Column(db.Integer, db.ForeignKey('cliente.id_cliente'), primary_key=True)
+    cnpj = db.Column(db.String(14), unique=True, nullable=False)
+    razao_social = db.Column(db.String(100))
+    inscricao_estadual = db.Column(db.String(20))
+    
+    __mapper_args__ = {
+        'polymorphic_identity': 'PJ'
+    }
 
-        dados = cur.fetchall()
+class ClienteContratado(Cliente):
+    __tablename__ = 'cliente_contratado'
+    id_cliente = db.Column(db.Integer, db.ForeignKey('cliente.id_cliente'), primary_key=True)
+    limite_credito = db.Column(db.Numeric(10, 2))
+    id_tabela_precos = db.Column(db.Integer)
+    
+    __mapper_args__ = {
+        'polymorphic_identity': 'Contrato'
+    }
 
-        cur.close()
-        conn.close()
+class VDetalhesCliente(db.Model):
+    __tablename__ = 'v_detalhes_clientes'
+    
+    id_cliente = db.Column(db.Integer, primary_key=True)
+    telefone = db.Column(db.String(15))
+    email = db.Column(db.String(50))
+    tipo_cliente = db.Column(db.String(20))
+    
+    pf_nome = db.Column(db.String(100))
+    pf_cpf = db.Column(db.String(11))
+    
+    pj_razao_social = db.Column(db.String(100))
+    pj_cnpj = db.Column(db.String(14))
+    pj_inscricao_estadual = db.Column(db.String(20))
+    
+    contrato_limite_credito = db.Column(db.Numeric(10, 2))
+    contrato_id_tabela_precos = db.Column(db.Integer)
+    
+    id_endereco = db.Column(db.Integer)
+    rua = db.Column(db.String(100))
+    cidade = db.Column(db.String(100))
+    estado = db.Column(db.String(100))
+    numero = db.Column(db.Integer)
 
-        return dados
-
-    @staticmethod
-    def inserir(telefone, email, tipo_cliente, id_endereco):
-
-        conn = get_connection()
-        cur = conn.cursor()
-
-        cur.execute("""
-            INSERT INTO trabalho.cliente
-            (telefone,email,tipo_cliente,id_endereco)
-            VALUES (%s,%s,%s,%s)
-        """, (telefone,email,tipo_cliente,id_endereco))
-
-        conn.commit()
-
-        cur.close()
-        conn.close()
+    tabela_descricao = db.Column(db.String(200))
+    tabela_regras = db.Column(db.Text)

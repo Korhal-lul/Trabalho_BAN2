@@ -1,9 +1,12 @@
-import psycopg2
+import os
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
-def get_connection():
-    return psycopg2.connect(
-        host="localhost",
-        database="transportadora",
-        user="postgres",
-        password="123456"
-    )
+load_dotenv()
+
+db = SQLAlchemy()
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('SECRET_KEY', 'chave-padrao-de-emergencia')

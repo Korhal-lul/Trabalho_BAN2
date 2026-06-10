@@ -178,4 +178,29 @@ CREATE TABLE Rota_Pedido(
 	horario_real TIME
 );
 
-
+CREATE OR REPLACE VIEW v_detalhes_clientes AS
+SELECT 
+    c.id_cliente,
+    c.telefone,
+    c.email,
+    c.tipo_cliente,
+    pf.nome AS pf_nome,
+    pf.cpf AS pf_cpf,
+    pj.razao_social AS pj_razao_social,
+    pj.cnpj AS pj_cnpj,
+    pj.inscricao_estadual AS pj_inscricao_estadual,
+    cc.limite_credito AS contrato_limite_credito,
+    cc.id_tabela_precos AS contrato_id_tabela_precos,
+    tp.descricao AS tabela_descricao,
+    tp.regras AS tabela_regras,
+    e.id_endereco,
+    e.rua,
+    e.cidade,
+    e.estado,
+    e.numero
+FROM Cliente c
+LEFT JOIN PF pf ON c.id_cliente = pf.id_cliente
+LEFT JOIN PJ pj ON c.id_cliente = pj.id_cliente
+LEFT JOIN Cliente_contratado cc ON c.id_cliente = cc.id_cliente
+LEFT JOIN Tabela_precos tp ON cc.id_tabela_precos = tp.id_tabela_precos
+LEFT JOIN Endereco e ON c.id_endereco = e.id_endereco;
