@@ -1,0 +1,164 @@
+{% extends 'template.html' %}
+
+{% block title %}Cadastrar Novo Cliente{% endblock %}
+
+{% block body %}
+<div class="col-md-8 mx-auto">
+  <a href="/" class="btn btn-outline-secondary mb-4">← Voltar para a Lista</a>
+
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">✨ Ficha de Cadastro de Cliente</h5>
+    </div>
+    <div class="card-body">
+      
+      <form action="/salvar_cliente" method="POST">
+        
+        <h5 class="text-primary mb-3">Informações Básicas</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="tipo_cliente" class="form-label fw-bold">Tipo de Cliente</label>
+            <select class="form-select border-primary" id="tipo_cliente" name="tipo_cliente" required onchange="alternarCamposEspecificos(this.value)">
+              <option value="" disabled selected>Selecione...</option>
+              <option value="PF">Pessoa Física (PF)</option>
+              <option value="PJ">Pessoa Jurídica (PJ)</option>
+              <option value="Contrato">Cliente Contratado</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-content form-control" id="email" name="email" maxlength="50" required placeholder="exemplo@email.com">
+          </div>
+            <div class="col-md-6">
+                <label for="telefone" class="form-label">Telefone (só números)</label>
+                <input type="text" class="form-control" id="telefone" name="telefone" 
+                        minlength="10" maxlength="11" pattern="[0-9]{10,11}" 
+                        required placeholder="Ex: 11999999999">
+                <div class="form-text small text-muted">Digite o DDD + número (10 ou 11 dígitos).</div>
+            </div>  
+        </div>
+
+        <div id="secao_especifica" class="p-3 bg-light rounded border mb-4 d-none">
+          
+          <div id="campos_pf" class="row g-3 d-none">
+            <h5 class="text-success mb-2">Dados de Pessoa Física</h5>
+            <div class="col-md-8">
+              <label for="nome" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="nome" name="nome" maxlength="100" placeholder="Digite o nome completo">
+            </div>
+            <div class="col-md-4">
+                <label for="cpf" class="form-label">CPF (somente números)</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" 
+                        minlength="11" maxlength="11" pattern="[0-9]{11}" 
+                        placeholder="12345678901">
+                <div class="form-text small text-muted">Exatamente 11 números.</div>
+            </div>
+          </div>
+
+          <div id="campos_pj" class="row g-3 d-none">
+            <h5 class="text-success mb-2">Dados de Pessoa Jurídica</h5>
+            <div class="col-md-6">
+              <label for="razao_social" class="form-label">Razão Social</label>
+              <input type="text" class="form-control" id="razao_social" name="razao_social" maxlength="100" placeholder="Empresa S.A.">
+            </div>
+            <div class="col-md-6">
+            <label for="cnpj" class="form-label">CNPJ (somente números)</label>
+            <input type="text" class="form-control" id="cnpj" name="cnpj" 
+                    minlength="14" maxlength="14" pattern="[0-9]{14}" 
+                    placeholder="12345678000199">
+            <div class="form-text small text-muted">Exatamente 14 números.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="inscricao_estadual" class="form-label">Inscrição Estadual</label>
+              <input type="text" class="form-control" id="inscricao_estadual" name="inscricao_estadual" maxlength="20" placeholder="Isento ou Número">
+            </div>
+          </div>
+
+          <div id="campos_contrato" class="row g-3 d-none">
+            <h5 class="text-success mb-2">Dados do Acordo Comercial</h5>
+            <div class="col-md-6">
+              <label for="limite_credito" class="form-label">Limite de Crédito (R$)</label>
+              <input type="number" step="0.01" class="form-control" id="limite_credito" name="limite_credito" placeholder="5000.00">
+            </div>
+            <div class="col-md-6">
+              <label for="id_tabela_precos" class="form-label">Tabela de Preços Associada</label>
+              <select class="form-select" id="id_tabela_precos" name="id_tabela_precos">
+                <option value="" selected>Nenhuma (Usar tarifas padrão)</option>
+                <option value="1">Tabela Bronze - Varejo</option>
+                <option value="2">Tabela Ouro - Corporativo</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <h5 class="text-primary mb-3">Endereço de Entrega/Faturamento</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="rua" class="form-label">Rua / Logradouro</label>
+            <input type="text" class="form-control" id="rua" name="rua" maxlength="100" required placeholder="Av. Paulista">
+          </div>
+          <div class="col-md-2">
+            <label for="numero" class="form-label">Número</label>
+            <input type="number" class="form-control" id="numero" name="numero" required placeholder="123">
+          </div>
+          <div class="col-md-2">
+            <label for="cidade" class="form-label">Cidade</label>
+            <input type="text" class="form-control" id="cidade" name="cidade" maxlength="100" required placeholder="São Paulo">
+          </div>
+          <div class="col-md-2">
+            <label for="estado" class="form-label">Estado (UF)</label>
+            <input type="text" class="form-control" id="estado" name="estado" maxlength="100" required placeholder="SP">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+          <a href="/" class="btn btn-light">Cancelar</a>
+          <button type="submit" class="btn btn-success px-4">Salvar Cliente</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function alternarCamposEspecificos(tipo) {
+    const secao = document.getElementById('secao_especifica');
+    const pf = document.getElementById('campos_pf');
+    const pj = document.getElementById('campos_pj');
+    const contrato = document.getElementById('campos_contrato');
+
+    secao.classList.remove('d-none');
+
+    pf.classList.add('d-none');
+    pj.classList.add('d-none');
+    contrato.classList.add('d-none');
+
+    configurarCamposObrigatorios(pf, false);
+    configurarCamposObrigatorios(pj, false);
+    configurarCamposObrigatorios(contrato, false);
+
+    if (tipo === 'PF') {
+        pf.classList.remove('d-none');
+        configurarCamposObrigatorios(pf, true);
+    } else if (tipo === 'PJ') {
+        pj.classList.remove('d-none');
+        configurarCamposObrigatorios(pj, true);
+    } else if (tipo === 'Contrato') {
+        contrato.classList.remove('d-none');
+        contrato.querySelector('#limite_credito').required = true; 
+    }
+}
+
+function configurarCamposObrigatorios(container, status) {
+    const inputs = container.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if(input.id !== 'inscricao_estadual' && input.id !== 'id_tabela_precos') {
+            input.required = status;
+        }
+    });
+}
+</script>
+{% endblock %}

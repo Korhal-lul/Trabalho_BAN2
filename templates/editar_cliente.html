@@ -1,0 +1,114 @@
+{% extends 'template.html' %}
+
+{% block title %}Editar Cliente #{{ cliente.id_cliente }}{% endblock %}
+
+{% block body %}
+<div class="col-md-8 mx-auto">
+  <a href="/cliente/{{ ocultar_id(cliente.id_cliente) }}" class="btn btn-outline-secondary mb-4">← Cancelar Edição</a>
+
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">✏️ Editando Ficha do Cliente #{{ cliente.id_cliente }}</h5>
+    </div>
+    <div class="card-body">
+      
+      <form action="/cliente/{{ ocultar_id(cliente.id_cliente) }}/salvar" method="POST">
+        
+        <h5 class="text-primary mb-3">Informações Básicas</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label fw-bold text-muted">Tipo de Cliente (Não editável)</label>
+            <input type="text" class="form-control bg-light" value="{{ cliente.tipo_cliente }}" disabled>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}" maxlength="50" required>
+          </div>
+          <div class="col-md-6">
+            <label for="telefone" class="form-label">Telefone (só números)</label>
+            <input type="text" class="form-control" id="telefone" name="telefone" 
+                    minlength="10" maxlength="11" pattern="[0-9]{10,11}" 
+                    required placeholder="Ex: 11999999999">
+            <div class="form-text small text-muted">Digite o DDD + número (10 ou 11 dígitos).</div>
+            </div>
+        </div>
+
+        <h5 class="text-success mb-3">Dados Específicos</h5>
+        <div class="p-3 bg-light rounded border mb-4">
+          
+          {% if cliente.tipo_cliente == 'PF' %}
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label for="nome" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="nome" name="nome" value="{{ cliente.pf_nome }}" required>
+            </div>
+            <div class="col-md-4">
+            <label for="cpf" class="form-label">CPF (somente números)</label>
+            <input type="text" class="form-control" id="cpf" name="cpf" 
+                    minlength="11" maxlength="11" pattern="[0-9]{11}" 
+                    placeholder="12345678901">
+            <div class="form-text small text-muted">Exatamente 11 números.</div>
+            </div>
+          </div>
+          
+          {% elif cliente.tipo_cliente == 'PJ' %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="razao_social" class="form-label">Razão Social</label>
+              <input type="text" class="form-control" id="razao_social" name="razao_social" value="{{ cliente.pj_razao_social }}" required>
+            </div>
+            <div class="col-md-6">
+            <label for="cnpj" class="form-label">CNPJ (somente números)</label>
+            <input type="text" class="form-control" id="cnpj" name="cnpj" 
+                    minlength="14" maxlength="14" pattern="[0-9]{14}" 
+                    placeholder="12345678000199">
+            <div class="form-text small text-muted">Exatamente 14 números.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="inscricao_estadual" class="form-label">Inscrição Estadual</label>
+              <input type="text" class="form-control" id="inscricao_estadual" name="inscricao_estadual" value="{{ cliente.pj_inscricao_estadual if cliente.pj_inscricao_estadual }}">
+            </div>
+          </div>
+          
+          {% elif cliente.tipo_cliente == 'Contrato' %}
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label for="limite_credito" class="form-label">Limite de Crédito (R$)</label>
+              <input type="number" step="0.01" class="form-control" id="limite_credito" name="limite_credito" value="{{ cliente.contrato_limite_credito }}" required>
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+
+        <h5 class="text-primary mb-3">Endereço</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="rua" class="form-label">Rua</label>
+            <input type="text" class="form-control" id="rua" name="rua" value="{{ cliente.rua }}" required>
+          </div>
+          <div class="col-md-2">
+            <label for="numero" class="form-label">Número</label>
+            <input type="number" class="form-control" id="numero" name="numero" value="{{ cliente.numero }}" required>
+          </div>
+          <div class="col-md-2">
+            <label for="cidade" class="form-label">Cidade</label>
+            <input type="text" class="form-control" id="cidade" name="cidade" value="{{ cliente.cidade }}" required>
+          </div>
+          <div class="col-md-2">
+            <label for="estado" class="form-label">Estado (UF)</label>
+            <input type="text" class="form-control" id="estado" name="estado" value="{{ cliente.estado }}" required>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+          <a href="/cliente/{{ ocultar_id(cliente.id_cliente) }}" class="btn btn-light">Cancelar</a>
+          <button type="submit" class="btn btn-warning text-dark px-4">Confirmar Alterações</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

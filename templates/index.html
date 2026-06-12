@@ -7,22 +7,27 @@
   <h1 class="display-5 fw-normal">Painel de Controle</h1>
   <p class="lead fw-normal text-muted">Gerencie os clientes cadastrados no banco de dados da transportadora.</p>
 
-  <div class="col-md-6 mx-auto mt-4">
-    <form>
-      <div class="input-group">
-        <label class="input-group-text" for="filterCliente">Filtrar por Tipo</label>
-        <select class="form-select" id="filterCliente" onchange="filtrarClientes(this.value)">
+  <div class="col-md-8 mx-auto mt-4">
+    <div class="d-flex justify-content-between align-items-center gap-3">
+        
+        <a href="/cad_cliente" class="btn btn-primary text-nowrap">
+        Cadastrar Cliente
+        </a>
+        
+        <form class="flex-grow-1" style="max-width: 400px;">
+        <div class="input-group">
+            <label class="input-group-text" for="filterCliente">Filtrar por Tipo</label>
+            <select class="form-select" id="filterCliente" onchange="filtrarClientes(this.value)">
             <option value="TODOS" {% if filtro_atual == 'TODOS' or not filtro_atual %}selected{% endif %}>Todos os Clientes</option>
-            
             <option value="PF" {% if filtro_atual == 'PF' %}selected{% endif %}>Pessoa Física (PF)</option>
-            
             <option value="PJ" {% if filtro_atual == 'PJ' %}selected{% endif %}>Pessoa Jurídica (PJ)</option>
-            
             <option value="CONTRATO" {% if filtro_atual == 'CONTRATO' %}selected{% endif %}>Clientes Contratados</option>
-        </select>
-      </div>
-    </form>
-  </div>
+            </select>
+        </div>
+        </form>
+
+    </div>
+    </div>
 </div>
 
 <div class="col-md-11 mx-auto shadow-sm p-3 mb-5 bg-white rounded">

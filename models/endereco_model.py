@@ -1,6 +1,6 @@
 from config.database import db
 
-class EnderecoModel(db.Model):
+class Endereco(db.Model):
     __tablename__ = 'endereco'
     
     id_endereco = db.Column(db.Integer, primary_key=True, autoincrement=True)
